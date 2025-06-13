@@ -5,18 +5,34 @@
 
 {% set blog = get_section(path="blog/_index.md") %}
 {% for page in blog.pages | slice(end=5) %}
-<article>
-    <h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
+<article class="post">
+    <h2 class="post-title"><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
     <div class="post-meta">
-        {{ page.date | date(format=config.extra.date_format) }}
+        <time>{{ page.date | date(format=config.extra.date_format) }}</time>
+        {% if page.taxonomies.categories %}
+        <span class="separator">·</span>
+        <span class="categories">
+            {% for category in page.taxonomies.categories %}
+            <a href="{{ get_taxonomy_url(kind="categories", name=category) }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </span>
+        {% endif %}
+        {% if page.taxonomies.tags %}
+        <span class="separator">·</span>
+        <span class="tags">
+            {% for tag in page.taxonomies.tags %}
+            <a href="{{ get_taxonomy_url(kind="tags", name=tag) }}">#{{ tag }}</a>{% if not loop.last %} {% endif %}
+            {% endfor %}
+        </span>
+        {% endif %}
     </div>
     {% if page.summary %}
-    <p>{{ page.summary }}</p>
+    <div class="post-summary">{{ page.summary | safe }}</div>
     {% endif %}
 </article>
 {% endfor %}
 
 {% if blog.pages | length > 5 %}
-<p><a href="/blog">View all posts →</a></p>
+<p class="view-all"><a href="/blog">View all posts →</a></p>
 {% endif %}
 {% endblock content %}
